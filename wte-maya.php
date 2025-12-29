@@ -261,7 +261,7 @@ class WTE_Maya_Plugin {
             echo '<p>Tab keys:</p><ul>';
             foreach ( array_keys( $test_tabs ) as $tab_key ) {
                 echo '<li>' . esc_html( $tab_key );
-                if ( $tab_key === 'maya_payment' ) {
+                if ( $tab_key === 'maya' ) {
                     echo ' ⭐ <strong>FOUND!</strong>';
                 }
                 echo '</li>';
