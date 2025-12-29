@@ -21,6 +21,13 @@ use WPTravelEngine\Core\Models\Post\Payment;
 class WTE_Maya_Gateway extends BaseGateway {
 
     /**
+     * Gateway ID
+     *
+     * @var string
+     */
+    protected $gateway_id = 'maya_enable';
+
+    /**
      * Cart version compatibility
      *
      * @var string
@@ -33,7 +40,7 @@ class WTE_Maya_Gateway extends BaseGateway {
      * @return string
      */
     public function get_gateway_id(): string {
-        return 'maya';
+        return $this->gateway_id;
     }
 
     /**

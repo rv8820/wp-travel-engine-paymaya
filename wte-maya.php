@@ -73,6 +73,9 @@ class WTE_Maya_Plugin {
         // Add settings tab to WP Travel Engine
         add_filter( 'wptravelengine_settings:tabs:payments', array( $this, 'register_settings_tab' ) );
 
+        // Add gateway to REST API list
+        add_filter( 'wptravelengine_rest_payment_gateways', array( $this, 'add_gateway_to_rest_api' ), 10, 2 );
+
         // Handle webhook callback
         add_action( 'init', array( $this, 'handle_webhook' ) );
 
@@ -106,7 +109,7 @@ class WTE_Maya_Plugin {
         if ( file_exists( $settings_file ) ) {
             $maya_settings = include $settings_file;
             if ( is_array( $maya_settings ) ) {
-                $settings['maya'] = $maya_settings;
+                $settings['maya_payment'] = $maya_settings;
             }
         }
         return $settings;
@@ -160,6 +163,23 @@ class WTE_Maya_Plugin {
     public function register_gateway( $payment_gateways ) {
         $payment_gateways['maya'] = new WTE_Maya_Gateway();
         return $payment_gateways;
+    }
+
+    /**
+     * Add gateway to REST API payment gateways list
+     *
+     * @param array  $gateways Existing gateways
+     * @param object $plugin_settings Plugin settings instance
+     * @return array Modified gateways array
+     */
+    public function add_gateway_to_rest_api( $gateways, $plugin_settings ) {
+        $gateways[] = array(
+            'id'     => 'maya_enable',
+            'name'   => __( 'Maya', 'wte-maya' ),
+            'enable' => wptravelengine_toggled( $plugin_settings->get( 'maya_enable' ) ),
+            'icon'   => plugin_dir_url( WTE_MAYA_PLUGIN_FILE ) . 'assets/maya-icon.png',
+        );
+        return $gateways;
     }
 
     /**
@@ -261,7 +281,7 @@ class WTE_Maya_Plugin {
             echo '<p>Tab keys:</p><ul>';
             foreach ( array_keys( $test_tabs ) as $tab_key ) {
                 echo '<li>' . esc_html( $tab_key );
-                if ( $tab_key === 'maya' ) {
+                if ( $tab_key === 'maya_payment' ) {
                     echo ' ⭐ <strong>FOUND!</strong>';
                 }
                 echo '</li>';
