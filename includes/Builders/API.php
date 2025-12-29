@@ -1,24 +1,14 @@
 <?php
-/**
- * Maya Payment Gateway - REST API Integration
- *
- * @package WTE_Maya
- */
+namespace WPTravelEngineMaya\Builders;
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+use WP_REST_Request;
 
 /**
- * REST API Integration Class
+ * REST API Integration
  */
-class WTE_Maya_API {
-
+class API {
     /**
      * Plugin settings instance
-     *
-     * @var object
      */
     protected $plugin_settings;
 
@@ -40,35 +30,31 @@ class WTE_Maya_API {
 
     /**
      * Add settings schema for REST API
-     *
-     * @param array  $schema Settings schema
-     * @param object $instance Settings instance
-     * @return array Modified schema
      */
     public function add_settings_schema( array $schema, $instance ): array {
         $schema['maya'] = array(
-            'description' => __( 'Maya Payment Gateway Settings', 'wte-maya' ),
+            'description' => __( 'Maya Payment Gateway Settings', 'wptravelengine-maya-payment' ),
             'type'        => 'object',
             'properties'  => array(
                 'gateway_label' => array(
                     'type'        => 'string',
-                    'description' => __( 'Gateway label displayed to users', 'wte-maya' ),
+                    'description' => __( 'Gateway label displayed to users', 'wptravelengine-maya-payment' ),
                 ),
                 'description' => array(
                     'type'        => 'string',
-                    'description' => __( 'Gateway description', 'wte-maya' ),
+                    'description' => __( 'Gateway description', 'wptravelengine-maya-payment' ),
                 ),
                 'instruction' => array(
                     'type'        => 'string',
-                    'description' => __( 'Payment instructions', 'wte-maya' ),
+                    'description' => __( 'Payment instructions', 'wptravelengine-maya-payment' ),
                 ),
                 'public_key' => array(
                     'type'        => 'string',
-                    'description' => __( 'Maya Public API Key', 'wte-maya' ),
+                    'description' => __( 'Maya Public API Key', 'wptravelengine-maya-payment' ),
                 ),
                 'test_mode' => array(
                     'type'        => 'boolean',
-                    'description' => __( 'Enable test mode', 'wte-maya' ),
+                    'description' => __( 'Enable test mode', 'wptravelengine-maya-payment' ),
                     'default'     => true,
                 ),
             ),
@@ -78,13 +64,8 @@ class WTE_Maya_API {
 
     /**
      * Prepare settings for REST response
-     *
-     * @param array  $settings Current settings
-     * @param object $request REST request
-     * @param object $instance Settings instance
-     * @return array Modified settings
      */
-    public function prepare_settings( $settings, $request, $instance ) {
+    public function prepare_settings( $settings, WP_REST_Request $request, $instance ) {
         $this->plugin_settings = $instance->plugin_settings;
 
         $settings['maya'] = array(
@@ -100,9 +81,6 @@ class WTE_Maya_API {
 
     /**
      * Update settings via REST API
-     *
-     * @param object $request REST request
-     * @param object $instance Settings instance
      */
     public function update_settings( $request, $instance ) {
         $this->plugin_settings = $instance->plugin_settings;

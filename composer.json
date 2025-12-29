@@ -1,0 +1,13 @@
+{
+    "name": "wptravelengine/maya-payment",
+    "description": "Maya Payment Gateway for WP Travel Engine",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "WPTravelEngineMaya\\": "includes/"
+        }
+    }
+}
