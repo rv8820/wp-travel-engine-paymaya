@@ -25,6 +25,15 @@ return array(
     'id'     => 'maya',
     'fields' => array(
 
+        // Enable Maya Payment Gateway
+        array(
+            'field_type' => 'TOGGLE',
+            'name'       => 'maya_enable',
+            'label'      => __( 'Enable Maya Payment Gateway', 'wte-maya' ),
+            'default'    => false,
+            'help'       => __( 'Enable this to activate Maya as a payment option for your customers.', 'wte-maya' ),
+        ),
+
         // Gateway Label
         array(
             'field_type'  => 'TEXT',

@@ -59,6 +59,13 @@ class API {
                 ),
             ),
         );
+
+        $schema['maya_enable'] = array(
+            'description' => __( 'Enable Maya Payment Gateway', 'wptravelengine-maya-payment' ),
+            'type'        => 'boolean',
+            'default'     => false,
+        );
+
         return $schema;
     }
 
@@ -76,6 +83,8 @@ class API {
             'test_mode'     => $this->plugin_settings->get( 'maya.test_mode', true ),
         );
 
+        $settings['maya_enable'] = $this->plugin_settings->get( 'maya_enable', false );
+
         return $settings;
     }
 
@@ -85,30 +94,34 @@ class API {
     public function update_settings( $request, $instance ) {
         $this->plugin_settings = $instance->plugin_settings;
 
-        if ( ! isset( $request['maya'] ) ) {
-            return;
+        // Handle maya_enable setting
+        if ( isset( $request['maya_enable'] ) ) {
+            $this->plugin_settings->set( 'maya_enable', (bool) $request['maya_enable'] );
         }
 
-        $maya = $request['maya'];
+        // Handle maya settings group
+        if ( isset( $request['maya'] ) ) {
+            $maya = $request['maya'];
 
-        if ( isset( $maya['gateway_label'] ) ) {
-            $this->plugin_settings->set( 'maya.gateway_label', sanitize_text_field( $maya['gateway_label'] ) );
-        }
+            if ( isset( $maya['gateway_label'] ) ) {
+                $this->plugin_settings->set( 'maya.gateway_label', sanitize_text_field( $maya['gateway_label'] ) );
+            }
 
-        if ( isset( $maya['description'] ) ) {
-            $this->plugin_settings->set( 'maya.description', sanitize_textarea_field( $maya['description'] ) );
-        }
+            if ( isset( $maya['description'] ) ) {
+                $this->plugin_settings->set( 'maya.description', sanitize_textarea_field( $maya['description'] ) );
+            }
 
-        if ( isset( $maya['instruction'] ) ) {
-            $this->plugin_settings->set( 'maya.instruction', sanitize_textarea_field( $maya['instruction'] ) );
-        }
+            if ( isset( $maya['instruction'] ) ) {
+                $this->plugin_settings->set( 'maya.instruction', sanitize_textarea_field( $maya['instruction'] ) );
+            }
 
-        if ( isset( $maya['public_key'] ) ) {
-            $this->plugin_settings->set( 'maya.public_key', sanitize_text_field( $maya['public_key'] ) );
-        }
+            if ( isset( $maya['public_key'] ) ) {
+                $this->plugin_settings->set( 'maya.public_key', sanitize_text_field( $maya['public_key'] ) );
+            }
 
-        if ( isset( $maya['test_mode'] ) ) {
-            $this->plugin_settings->set( 'maya.test_mode', (bool) $maya['test_mode'] );
+            if ( isset( $maya['test_mode'] ) ) {
+                $this->plugin_settings->set( 'maya.test_mode', (bool) $maya['test_mode'] );
+            }
         }
 
         $this->plugin_settings->save();
