@@ -106,7 +106,7 @@ class WTE_Maya_Plugin {
         if ( file_exists( $settings_file ) ) {
             $maya_settings = include $settings_file;
             if ( is_array( $maya_settings ) ) {
-                $settings['maya_payment'] = $maya_settings;
+                $settings['maya'] = $maya_settings;
             }
         }
         return $settings;
