@@ -126,3 +126,28 @@ foreach ( $active_plugins as $plugin ) {
     echo '</li>';
 }
 echo '</ul>';
+
+// Check settings tabs
+echo '<h2>9. Settings Tabs Registration</h2>';
+$settings_tabs_filter = 'wptravelengine_settings:tabs:payments';
+echo "Filter being used: <code>$settings_tabs_filter</code><br>";
+$test_tabs = apply_filters( $settings_tabs_filter, array() );
+echo 'Tabs registered: ' . count( $test_tabs ) . '<br>';
+if ( ! empty( $test_tabs ) ) {
+    echo '<pre>' . print_r( array_keys( $test_tabs ), true ) . '</pre>';
+}
+
+// Check if settings file exists
+echo '<h2>10. Settings File</h2>';
+$settings_file = WTE_MAYA_PLUGIN_DIR . 'includes/Builders/global-settings.php';
+echo 'Settings file path: <code>' . esc_html( $settings_file ) . '</code><br>';
+echo 'File exists: ' . ( file_exists( $settings_file ) ? '✅ Yes' : '❌ No' ) . '<br>';
+if ( file_exists( $settings_file ) ) {
+    $settings_data = include $settings_file;
+    echo 'Settings data type: ' . gettype( $settings_data ) . '<br>';
+    if ( is_array( $settings_data ) ) {
+        echo 'Settings ID: ' . ( $settings_data['id'] ?? 'not set' ) . '<br>';
+        echo 'Settings title: ' . ( $settings_data['title'] ?? 'not set' ) . '<br>';
+        echo 'Number of fields: ' . ( isset( $settings_data['fields'] ) ? count( $settings_data['fields'] ) : 0 ) . '<br>';
+    }
+}
