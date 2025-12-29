@@ -50,20 +50,21 @@ Then activate the plugin in WordPress admin.
 
 ### 2. Configure Plugin Settings
 
-1. Go to **WP Travel Engine > Settings > Payment**
-2. Find the **Maya Payment Gateway** section
+1. Go to **WP Travel Engine > Settings**
+2. Click on the **Maya Payment Gateway** tab
 3. Configure the following settings:
 
 | Setting | Description |
 |---------|-------------|
-| **Enable Maya Gateway** | Check to enable Maya as a payment option |
-| **Title** | The title shown to customers (default: "Maya Payment Gateway") |
+| **Gateway Label** | The title shown to customers (default: "Maya") |
 | **Description** | Description shown at checkout |
 | **Instructions** | Additional instructions for customers |
 | **Enable Test Mode** | Enable for sandbox testing, disable for live payments |
 | **Public API Key** | Your Maya public API key (starts with `pk-`) |
 
-4. Click **Save Changes**
+4. Click **Save Settings**
+
+**Note:** The webhook URL will be displayed in the settings page. Copy it to configure in your Maya Manager account.
 
 ### 3. Configure Webhooks (Important!)
 

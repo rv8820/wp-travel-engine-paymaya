@@ -70,6 +70,9 @@ class WTE_Maya_Plugin {
         // Register the payment gateway
         add_filter( 'wptravelengine_registering_payment_gateways', array( $this, 'register_gateway' ) );
 
+        // Add settings tab to WP Travel Engine
+        add_filter( 'wptravelengine_settings:tabs:payments', array( $this, 'register_settings_tab' ) );
+
         // Handle webhook callback
         add_action( 'init', array( $this, 'handle_webhook' ) );
     }
@@ -80,7 +83,30 @@ class WTE_Maya_Plugin {
     private function load_dependencies() {
         require_once WTE_MAYA_PLUGIN_DIR . 'includes/class-maya-api-client.php';
         require_once WTE_MAYA_PLUGIN_DIR . 'includes/class-maya-gateway.php';
-        require_once WTE_MAYA_PLUGIN_DIR . 'includes/class-maya-settings.php';
+
+        // Load REST API integration if exists
+        $api_file = WTE_MAYA_PLUGIN_DIR . 'includes/Builders/API.php';
+        if ( file_exists( $api_file ) ) {
+            require_once $api_file;
+            new WTE_Maya_API();
+        }
+    }
+
+    /**
+     * Register Maya settings tab
+     *
+     * @param array $settings Existing settings tabs
+     * @return array Modified settings tabs
+     */
+    public function register_settings_tab( $settings ) {
+        $settings_file = WTE_MAYA_PLUGIN_DIR . 'includes/Builders/global-settings.php';
+        if ( file_exists( $settings_file ) ) {
+            $maya_settings = include $settings_file;
+            if ( is_array( $maya_settings ) ) {
+                $settings['maya_payment'] = $maya_settings;
+            }
+        }
+        return $settings;
     }
 
     /**
