@@ -29,7 +29,6 @@ class Payment extends BaseGateway {
      * Constructor
      */
     public function __construct() {
-        parent::__construct();
         $this->settings = wptravelengine_settings()->get();
     }
 
