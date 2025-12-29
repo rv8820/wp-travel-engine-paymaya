@@ -58,6 +58,32 @@ function wptravelengine_maya_admin_notice() {
 }
 
 /**
+ * PSR-4 Autoloader for WPTravelEngineMaya namespace
+ */
+spl_autoload_register( function ( $class ) {
+    // Only autoload classes in our namespace
+    $prefix = 'WPTravelEngineMaya\\';
+    $base_dir = WPTRAVELENGINE_MAYA_ABSPATH . 'includes/';
+
+    // Check if the class uses the namespace prefix
+    $len = strlen( $prefix );
+    if ( strncmp( $prefix, $class, $len ) !== 0 ) {
+        return;
+    }
+
+    // Get the relative class name
+    $relative_class = substr( $class, $len );
+
+    // Replace namespace separators with directory separators
+    $file = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
+
+    // If the file exists, require it
+    if ( file_exists( $file ) ) {
+        require $file;
+    }
+} );
+
+/**
  * Initialize the plugin
  */
 function wptravelengine_maya_payment_init() {
@@ -65,9 +91,6 @@ function wptravelengine_maya_payment_init() {
     if ( ! wptravelengine_maya_check_compatibility() ) {
         return;
     }
-
-    // Load Composer autoloader
-    require_once WPTRAVELENGINE_MAYA_ABSPATH . 'vendor/autoload.php';
 
     // Initialize plugin
     WPTravelEngineMaya\Plugin::instance();
