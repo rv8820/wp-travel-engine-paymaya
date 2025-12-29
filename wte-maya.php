@@ -68,7 +68,7 @@ class WTE_Maya_Plugin {
         add_action( 'admin_init', array( $this, 'check_dependencies' ) );
 
         // Register the payment gateway
-        add_filter( 'wptravelengine_registering_payment_gateways', array( $this, 'register_gateway' ) );
+        add_action( 'wptravelengine_registering_payment_gateways', array( $this, 'register_gateway' ) );
 
         // Add settings tab to WP Travel Engine
         add_filter( 'wptravelengine_settings:tabs:payments', array( $this, 'register_settings_tab' ) );
