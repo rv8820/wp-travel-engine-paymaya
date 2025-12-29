@@ -2,6 +2,7 @@
 namespace WPTravelEngineMaya;
 
 use WPTravelEngineMaya\Builders\API;
+use WPTravelEngineMaya\AdminSettings;
 
 /**
  * Main Plugin Class
@@ -28,6 +29,7 @@ class Plugin {
     private function __construct() {
         $this->init_hooks();
         $this->init_api();
+        $this->init_admin();
     }
 
     /**
@@ -52,6 +54,15 @@ class Plugin {
      */
     private function init_api() {
         new API();
+    }
+
+    /**
+     * Initialize admin settings page
+     */
+    private function init_admin() {
+        if ( is_admin() ) {
+            AdminSettings::instance();
+        }
     }
 
     /**
