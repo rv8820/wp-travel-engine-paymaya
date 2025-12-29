@@ -22,7 +22,7 @@ $webhook_url = add_query_arg(
 return array(
     'title'  => __( 'Maya', 'wte-maya' ),
     'order'  => 10,
-    'id'     => 'maya_payment',
+    'id'     => 'maya',
     'fields' => array(
 
         // Gateway Label
