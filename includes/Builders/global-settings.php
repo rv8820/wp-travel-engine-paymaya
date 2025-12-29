@@ -22,7 +22,7 @@ $webhook_url = add_query_arg(
 return array(
     'title'  => __( 'Maya', 'wte-maya' ),
     'order'  => 10,
-    'id'     => 'maya',
+    'id'     => 'maya_payment',
     'fields' => array(
 
         // Enable Maya Payment Gateway

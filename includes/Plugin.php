@@ -69,7 +69,7 @@ class Plugin {
      * Add global settings tab
      */
     public function add_global_settings( $settings ) {
-        $settings['maya'] = require_once WPTRAVELENGINE_MAYA_ABSPATH . 'includes/Builders/global-settings.php';
+        $settings['maya_payment'] = require_once WPTRAVELENGINE_MAYA_ABSPATH . 'includes/Builders/global-settings.php';
         return $settings;
     }
 
