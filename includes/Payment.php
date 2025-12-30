@@ -107,9 +107,9 @@ class Payment extends BaseGateway {
      */
     protected function _process( Booking $booking, PaymentModel $payment, float $amount ): void {
         // Get API settings
-        if ( empty( $this->settings['maya']['secret_key'] ) ) {
+        if ( empty( $this->settings['maya']['public_key'] ) ) {
             wp_die(
-                esc_html__( 'Maya payment gateway is not configured. Please enter your Secret API Key in the settings.', 'wptravelengine-maya-payment' ),
+                esc_html__( 'Maya payment gateway is not configured. Please enter your Public API Key in the settings.', 'wptravelengine-maya-payment' ),
                 esc_html__( 'Payment Error', 'wptravelengine-maya-payment' )
             );
         }

@@ -85,11 +85,6 @@ class AdminSettings {
             $settings->set( 'maya.instruction', sanitize_textarea_field( $_POST['instruction'] ) );
         }
 
-        // Save secret key
-        if ( isset( $_POST['secret_key'] ) ) {
-            $settings->set( 'maya.secret_key', sanitize_text_field( $_POST['secret_key'] ) );
-        }
-
         // Save public key
         if ( isset( $_POST['public_key'] ) ) {
             $settings->set( 'maya.public_key', sanitize_text_field( $_POST['public_key'] ) );
@@ -135,7 +130,6 @@ class AdminSettings {
         $description = $settings['maya']['description'] ?? '';
         $instruction = $settings['maya']['instruction'] ?? '';
         $public_key = $settings['maya']['public_key'] ?? '';
-        $secret_key = $settings['maya']['secret_key'] ?? '';
         $test_mode = $settings['maya']['test_mode'] ?? true;
 
         // Webhook URL - REST API endpoint
@@ -219,30 +213,16 @@ class AdminSettings {
                         </td>
                     </tr>
 
-                    <!-- Secret API Key -->
-                    <tr>
-                        <th scope="row">
-                            <label for="secret_key"><?php _e( 'Secret API Key', 'wptravelengine-maya-payment' ); ?></label>
-                        </th>
-                        <td>
-                            <input type="password" name="secret_key" id="secret_key" value="<?php echo esc_attr( $secret_key ); ?>" class="large-text" placeholder="sk-...">
-                            <p class="description">
-                                <?php _e( 'Enter your Maya Secret API Key (starts with sk-). Required for creating checkout sessions.', 'wptravelengine-maya-payment' ); ?>
-                                <?php _e( 'Get your keys from', 'wptravelengine-maya-payment' ); ?>
-                                <a href="https://manager.paymaya.com" target="_blank">Maya Manager</a>
-                            </p>
-                        </td>
-                    </tr>
-
                     <!-- Public API Key -->
                     <tr>
                         <th scope="row">
-                            <label for="public_key"><?php _e( 'Public API Key (Optional)', 'wptravelengine-maya-payment' ); ?></label>
+                            <label for="public_key"><?php _e( 'Public API Key', 'wptravelengine-maya-payment' ); ?></label>
                         </th>
                         <td>
                             <input type="text" name="public_key" id="public_key" value="<?php echo esc_attr( $public_key ); ?>" class="large-text" placeholder="pk-...">
                             <p class="description">
-                                <?php _e( 'Enter your Maya Public API Key (starts with pk-). Optional - used for client-side operations.', 'wptravelengine-maya-payment' ); ?>
+                                <?php _e( 'Enter your Maya Public API Key (starts with pk-). Get your keys from', 'wptravelengine-maya-payment' ); ?>
+                                <a href="https://manager.paymaya.com" target="_blank">Maya Manager</a>
                             </p>
                         </td>
                     </tr>
