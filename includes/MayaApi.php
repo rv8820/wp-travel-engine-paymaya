@@ -46,6 +46,10 @@ class MayaApi {
         $url = $this->api_url . $endpoint;
         $auth_string = base64_encode( $this->public_key . ':' );
 
+        // Debug: Log the first and last 4 characters of the key for verification
+        $key_preview = substr( $this->public_key, 0, 7 ) . '...' . substr( $this->public_key, -4 );
+        error_log( '[Maya API Auth] Using key: ' . $key_preview . ' (length: ' . strlen( $this->public_key ) . ')' );
+
         $args = array(
             'method'  => $method,
             'headers' => array(
