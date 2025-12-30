@@ -132,14 +132,8 @@ class AdminSettings {
         $public_key = $settings['maya']['public_key'] ?? '';
         $test_mode = $settings['maya']['test_mode'] ?? true;
 
-        // Webhook URL
-        $webhook_url = add_query_arg(
-            array(
-                'payment_key' => '{payment_key}',
-                'callback_type' => 'notification',
-            ),
-            home_url( '/' )
-        );
+        // Webhook URL - REST API endpoint
+        $webhook_url = rest_url( 'wte-maya/v1/webhook' );
 
         ?>
         <div class="wrap">
