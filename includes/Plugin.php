@@ -30,6 +30,7 @@ class Plugin {
         $this->init_hooks();
         $this->init_api();
         $this->init_admin();
+        $this->init_webhooks();
     }
 
     /**
@@ -63,6 +64,13 @@ class Plugin {
         if ( is_admin() ) {
             AdminSettings::instance();
         }
+    }
+
+    /**
+     * Initialize webhook handler
+     */
+    private function init_webhooks() {
+        WebhookHandler::init();
     }
 
     /**
