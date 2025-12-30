@@ -270,7 +270,17 @@ class Payment extends BaseGateway {
      */
     public function handle_success_request( Booking $booking, PaymentModel $payment ): void {
         $payment_key = sanitize_text_field( $_REQUEST['payment_key'] ?? '' );
-        wp_redirect( add_query_arg( 'payment_key', $payment_key, $booking->get_confirmation_url() ) );
+
+        // Get confirmation page from settings
+        $thankyou_page_id = wptravelengine_settings()->get( 'pages.wp_travel_engine_thank_you' );
+        if ( $thankyou_page_id ) {
+            $confirmation_url = get_permalink( $thankyou_page_id );
+        } else {
+            // Fallback to booking view page
+            $confirmation_url = home_url( '/booking/' );
+        }
+
+        wp_redirect( add_query_arg( 'payment_key', $payment_key, $confirmation_url ) );
         exit;
     }
 
