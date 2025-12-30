@@ -97,10 +97,9 @@ class Payment extends BaseGateway {
      */
     public function process_payment_v2( Booking $booking, PaymentModel $payment, BookingProcess $booking_process ): void {
         $this->payment = $payment;
-        
-        // Get total from cart
-        $cart = $payment->get_meta( 'cart_info' );
-        $payable_amount = (float) ( $cart['totals']['total'] ?? 0 );
+
+        // Get payable amount from payment object
+        $payable_amount = (float) $payment->get_amount();
 
         $this->_process( $booking, $payment, $payable_amount );
     }
@@ -154,10 +153,31 @@ class Payment extends BaseGateway {
     private function prepare_checkout_data( Booking $booking, PaymentModel $payment, float $amount ): array {
         $booking_id = $booking->get_id();
         $billing_info = $payment->get_meta( 'billing_info' );
+        $cart_info = $payment->get_meta( 'cart_info' );
 
-        // Get trip info
-        $trip_id = get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_trip_id', true );
-        $trip_name = get_the_title( $trip_id );
+        // Get trip info from cart or booking
+        $trip_id = '';
+        $trip_name = '';
+
+        // Try to get from cart info first
+        if ( ! empty( $cart_info['items'] ) ) {
+            $first_item = reset( $cart_info['items'] );
+            $trip_id = $first_item['trip_id'] ?? '';
+            $trip_name = $first_item['title'] ?? '';
+        }
+
+        // Fallback to booking meta
+        if ( empty( $trip_id ) ) {
+            $trip_id = get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_trip_id', true );
+        }
+        if ( empty( $trip_name ) && ! empty( $trip_id ) ) {
+            $trip_name = get_the_title( $trip_id );
+        }
+
+        // Final fallback
+        if ( empty( $trip_name ) ) {
+            $trip_name = sprintf( __( 'Trip Booking #%s', 'wptravelengine-maya-payment' ), $booking_id );
+        }
 
         // Prepare items
         $items = array(
