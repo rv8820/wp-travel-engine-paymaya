@@ -96,7 +96,7 @@ class Payment extends BaseGateway {
      * Process payment - Modern method (WP Travel Engine v6.7.0+)
      */
     public function process_payment_v2( Booking $booking, PaymentModel $payment, BookingProcess $booking_process ): void {
-       // Get payable amount from payment object
+        // Get payable amount from payment object
         $payable_amount = (float) $payment->get_amount();
 
         $this->_process( $booking, $payment, $payable_amount );
