@@ -110,9 +110,11 @@ class Payment extends BaseGateway {
             }
         }
 
-        // Debug: Log payment data
+        // Debug: Log ALL available data
         error_log( '[Maya Payment Debug] Payment->get_amount(): ' . $payment->get_amount() );
         error_log( '[Maya Payment Debug] Booking Total Meta: ' . get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_cost', true ) );
+        error_log( '[Maya Payment Debug] All Booking Meta: ' . wp_json_encode( get_post_meta( $booking_id ) ) );
+        error_log( '[Maya Payment Debug] Payment All Meta: ' . wp_json_encode( $payment->get_meta() ) );
         error_log( '[Maya Payment Debug] Final Payable Amount: ' . $payable_amount );
 
         $this->_process( $booking, $payment, $payable_amount );
