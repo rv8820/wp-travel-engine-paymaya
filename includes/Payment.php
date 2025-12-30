@@ -103,19 +103,20 @@ class Payment extends BaseGateway {
 
         // If payment amount is 0, get from booking meta
         if ( $payable_amount == 0 ) {
-            // Try getting total from booking meta
-            $total_cost = get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_cost', true );
-            if ( ! empty( $total_cost ) ) {
-                $payable_amount = (float) $total_cost;
+            // Try getting from cart_info
+            $cart_info = get_post_meta( $booking_id, 'cart_info', true );
+            if ( ! empty( $cart_info ) && is_array( $cart_info ) ) {
+                $payable_amount = (float) ( $cart_info['totals']['payable_now'] ?? $cart_info['totals']['total'] ?? 0 );
+            }
+
+            // Fallback to due_amount
+            if ( $payable_amount == 0 ) {
+                $due_amount = get_post_meta( $booking_id, 'due_amount', true );
+                if ( ! empty( $due_amount ) ) {
+                    $payable_amount = (float) $due_amount;
+                }
             }
         }
-
-        // Debug: Log ALL available data
-        error_log( '[Maya Payment Debug] Payment->get_amount(): ' . $payment->get_amount() );
-        error_log( '[Maya Payment Debug] Booking Total Meta: ' . get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_cost', true ) );
-        error_log( '[Maya Payment Debug] All Booking Meta: ' . wp_json_encode( get_post_meta( $booking_id ) ) );
-        error_log( '[Maya Payment Debug] Payment All Meta: ' . wp_json_encode( $payment->get_meta() ) );
-        error_log( '[Maya Payment Debug] Final Payable Amount: ' . $payable_amount );
 
         $this->_process( $booking, $payment, $payable_amount );
     }
