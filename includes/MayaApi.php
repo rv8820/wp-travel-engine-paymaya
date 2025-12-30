@@ -6,9 +6,9 @@ namespace WPTravelEngineMaya;
  */
 class MayaApi {
     /**
-     * API public key
+     * API secret key
      */
-    private $public_key;
+    private $secret_key;
 
     /**
      * Test mode flag
@@ -24,7 +24,7 @@ class MayaApi {
      * Constructor
      */
     public function __construct( $settings ) {
-        $this->public_key = $settings['public_key'] ?? '';
+        $this->secret_key = $settings['secret_key'] ?? '';
         $this->test_mode = wptravelengine_toggled( $settings['test_mode'] ?? false );
         $this->api_url = $this->test_mode
             ? 'https://pg-sandbox.paymaya.com'
@@ -44,11 +44,11 @@ class MayaApi {
      */
     private function make_request( $method, $endpoint, $data = array() ) {
         $url = $this->api_url . $endpoint;
-        $auth_string = base64_encode( $this->public_key . ':' );
+        $auth_string = base64_encode( $this->secret_key . ':' );
 
         // Debug: Log the first and last 4 characters of the key for verification
-        $key_preview = substr( $this->public_key, 0, 7 ) . '...' . substr( $this->public_key, -4 );
-        error_log( '[Maya API Auth] Using key: ' . $key_preview . ' (length: ' . strlen( $this->public_key ) . ')' );
+        $key_preview = substr( $this->secret_key, 0, 7 ) . '...' . substr( $this->secret_key, -4 );
+        error_log( '[Maya API Auth] Using key: ' . $key_preview . ' (length: ' . strlen( $this->secret_key ) . ')' );
 
         $args = array(
             'method'  => $method,
