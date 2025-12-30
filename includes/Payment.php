@@ -99,6 +99,11 @@ class Payment extends BaseGateway {
         // Get payable amount from payment object
         $payable_amount = (float) $payment->get_amount();
 
+        // Debug: Log payment data
+        error_log( '[Maya Payment Debug] Payment Amount: ' . $payable_amount );
+        error_log( '[Maya Payment Debug] Cart Info: ' . wp_json_encode( $payment->get_meta( 'cart_info' ) ) );
+        error_log( '[Maya Payment Debug] Booking ID: ' . $booking->get_id() );
+
         $this->_process( $booking, $payment, $payable_amount );
     }
 
