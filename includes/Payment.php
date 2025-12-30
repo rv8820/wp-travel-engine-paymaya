@@ -167,10 +167,12 @@ class Payment extends BaseGateway {
                 'code'        => 'TRIP-' . $trip_id,
                 'description' => sprintf( __( 'Booking #%s', 'wptravelengine-maya-payment' ), $booking_id ),
                 'amount'      => array(
-                    'value' => $amount,
+                    'value'    => $amount,
+                    'currency' => 'PHP',
                 ),
                 'totalAmount' => array(
-                    'value' => $amount,
+                    'value'    => $amount,
+                    'currency' => 'PHP',
                 ),
             ),
         );
