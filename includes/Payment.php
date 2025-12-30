@@ -96,13 +96,24 @@ class Payment extends BaseGateway {
      * Process payment - Modern method (WP Travel Engine v6.7.0+)
      */
     public function process_payment_v2( Booking $booking, PaymentModel $payment, BookingProcess $booking_process ): void {
-        // Get payable amount from payment object
+        $booking_id = $booking->get_id();
+
+        // Try to get amount from payment object first
         $payable_amount = (float) $payment->get_amount();
 
+        // If payment amount is 0, get from booking meta
+        if ( $payable_amount == 0 ) {
+            // Try getting total from booking meta
+            $total_cost = get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_cost', true );
+            if ( ! empty( $total_cost ) ) {
+                $payable_amount = (float) $total_cost;
+            }
+        }
+
         // Debug: Log payment data
-        error_log( '[Maya Payment Debug] Payment Amount: ' . $payable_amount );
-        error_log( '[Maya Payment Debug] Cart Info: ' . wp_json_encode( $payment->get_meta( 'cart_info' ) ) );
-        error_log( '[Maya Payment Debug] Booking ID: ' . $booking->get_id() );
+        error_log( '[Maya Payment Debug] Payment->get_amount(): ' . $payment->get_amount() );
+        error_log( '[Maya Payment Debug] Booking Total Meta: ' . get_post_meta( $booking_id, 'wp_travel_engine_booking_setting_cost', true ) );
+        error_log( '[Maya Payment Debug] Final Payable Amount: ' . $payable_amount );
 
         $this->_process( $booking, $payment, $payable_amount );
     }
