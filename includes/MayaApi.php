@@ -58,6 +58,7 @@ class MayaApi {
 
         if ( 'POST' === $method && ! empty( $data ) ) {
             $args['body'] = wp_json_encode( $data );
+            error_log( '[Maya API Request] URL: ' . $url . ', Data: ' . wp_json_encode( $data ) );
         }
 
         $response = wp_remote_request( $url, $args );
@@ -73,8 +74,16 @@ class MayaApi {
 
         if ( $response_code < 200 || $response_code >= 300 ) {
             $error_message = $decoded_response['message'] ?? 'Unknown API error';
-            error_log( '[Maya API Error] Code: ' . $response_code . ', Message: ' . $error_message );
-            return new \WP_Error( 'maya_api_error', $error_message, array( 'status' => $response_code ) );
+            $error_details = wp_json_encode( $decoded_response );
+            error_log( '[Maya API Error] Code: ' . $response_code . ', Response: ' . $error_details );
+
+            // Return detailed error message
+            $display_message = $error_message;
+            if ( ! empty( $decoded_response['errors'] ) ) {
+                $display_message .= ' - ' . wp_json_encode( $decoded_response['errors'] );
+            }
+
+            return new \WP_Error( 'maya_api_error', $display_message, array( 'status' => $response_code ) );
         }
 
         return $decoded_response;
