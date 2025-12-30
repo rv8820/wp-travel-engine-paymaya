@@ -3,7 +3,7 @@
  * Plugin Name: WP Travel Engine - Maya Payment
  * Plugin URI: https://github.com/rv8820/wp-travel-engine-paymaya
  * Description: Maya Payment Gateway integration for WP Travel Engine
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: WP Travel Engine
  * Author URI: https://wptravelengine.com/
  * License: GPL-2.0+
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'WPTRAVELENGINE_MAYA_VERSION', '1.0.0' );
+define( 'WPTRAVELENGINE_MAYA_VERSION', '1.1.0' );
 define( 'WPTRAVELENGINE_MAYA_FILE_PATH', __FILE__ );
 define( 'WPTRAVELENGINE_MAYA_ABSPATH', dirname( WPTRAVELENGINE_MAYA_FILE_PATH ) . '/' );
 define( 'WPTRAVELENGINE_MAYA_BASE_PATH', plugin_basename( WPTRAVELENGINE_MAYA_FILE_PATH ) );
