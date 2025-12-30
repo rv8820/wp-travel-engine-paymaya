@@ -26,7 +26,7 @@ class AdminSettings {
      */
     private function __construct() {
         add_action( 'admin_menu', array( $this, 'add_admin_menu' ), 100 );
-        add_action( 'admin_init', array( $this, 'register_settings' ) );
+        add_action( 'admin_init', array( $this, 'handle_form_submission' ) );
         add_action( 'admin_notices', array( $this, 'show_notices' ) );
     }
 
@@ -45,56 +45,64 @@ class AdminSettings {
     }
 
     /**
-     * Register settings
+     * Handle form submission
      */
-    public function register_settings() {
-        register_setting( 'wte_maya_settings', 'wte_maya_settings', array(
-            'sanitize_callback' => array( $this, 'sanitize_settings' ),
-        ) );
-    }
+    public function handle_form_submission() {
+        // Check if our form was submitted
+        if ( ! isset( $_POST['wte_maya_save_settings'] ) ) {
+            return;
+        }
 
-    /**
-     * Sanitize settings
-     */
-    public function sanitize_settings( $input ) {
+        // Verify nonce
+        if ( ! isset( $_POST['wte_maya_nonce'] ) || ! wp_verify_nonce( $_POST['wte_maya_nonce'], 'wte_maya_settings' ) ) {
+            return;
+        }
+
+        // Check user permissions
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        // Get WP Travel Engine settings object
         $settings = wptravelengine_settings();
 
         // Save maya_enable
-        if ( isset( $input['maya_enable'] ) ) {
-            $settings->set( 'maya_enable', (bool) $input['maya_enable'] );
-        } else {
-            $settings->set( 'maya_enable', false );
+        $maya_enable = isset( $_POST['maya_enable'] ) ? true : false;
+        $settings->set( 'maya_enable', $maya_enable );
+
+        // Save gateway label
+        if ( isset( $_POST['gateway_label'] ) ) {
+            $settings->set( 'maya.gateway_label', sanitize_text_field( $_POST['gateway_label'] ) );
         }
 
-        // Save maya settings
-        if ( isset( $input['gateway_label'] ) ) {
-            $settings->set( 'maya.gateway_label', sanitize_text_field( $input['gateway_label'] ) );
+        // Save description
+        if ( isset( $_POST['description'] ) ) {
+            $settings->set( 'maya.description', sanitize_textarea_field( $_POST['description'] ) );
         }
 
-        if ( isset( $input['description'] ) ) {
-            $settings->set( 'maya.description', sanitize_textarea_field( $input['description'] ) );
+        // Save instruction
+        if ( isset( $_POST['instruction'] ) ) {
+            $settings->set( 'maya.instruction', sanitize_textarea_field( $_POST['instruction'] ) );
         }
 
-        if ( isset( $input['instruction'] ) ) {
-            $settings->set( 'maya.instruction', sanitize_textarea_field( $input['instruction'] ) );
+        // Save public key
+        if ( isset( $_POST['public_key'] ) ) {
+            $settings->set( 'maya.public_key', sanitize_text_field( $_POST['public_key'] ) );
         }
 
-        if ( isset( $input['public_key'] ) ) {
-            $settings->set( 'maya.public_key', sanitize_text_field( $input['public_key'] ) );
-        }
+        // Save test mode
+        $test_mode = isset( $_POST['test_mode'] ) ? true : false;
+        $settings->set( 'maya.test_mode', $test_mode );
 
-        if ( isset( $input['test_mode'] ) ) {
-            $settings->set( 'maya.test_mode', (bool) $input['test_mode'] );
-        } else {
-            $settings->set( 'maya.test_mode', false );
-        }
-
+        // Save all settings
         $settings->save();
 
         // Set transient for success message
         set_transient( 'wte_maya_settings_saved', true, 30 );
 
-        return $input;
+        // Redirect to avoid form resubmission
+        wp_redirect( add_query_arg( 'settings-updated', 'true', wp_get_referer() ) );
+        exit;
     }
 
     /**
@@ -137,8 +145,9 @@ class AdminSettings {
         <div class="wrap">
             <h1><?php _e( 'Maya Payment Gateway Settings', 'wptravelengine-maya-payment' ); ?></h1>
 
-            <form method="post" action="options.php">
-                <?php settings_fields( 'wte_maya_settings' ); ?>
+            <form method="post" action="">
+                <?php wp_nonce_field( 'wte_maya_settings', 'wte_maya_nonce' ); ?>
+                <input type="hidden" name="wte_maya_save_settings" value="1">
 
                 <table class="form-table">
                     <!-- Enable/Disable -->
@@ -148,7 +157,7 @@ class AdminSettings {
                         </th>
                         <td>
                             <label>
-                                <input type="checkbox" name="wte_maya_settings[maya_enable]" id="maya_enable" value="1" <?php checked( $maya_enable, true ); ?>>
+                                <input type="checkbox" name="maya_enable" id="maya_enable" value="1" <?php checked( $maya_enable, true ); ?>>
                                 <?php _e( 'Enable Maya as a payment option', 'wptravelengine-maya-payment' ); ?>
                             </label>
                         </td>
@@ -160,7 +169,7 @@ class AdminSettings {
                             <label for="gateway_label"><?php _e( 'Gateway Label', 'wptravelengine-maya-payment' ); ?></label>
                         </th>
                         <td>
-                            <input type="text" name="wte_maya_settings[gateway_label]" id="gateway_label" value="<?php echo esc_attr( $gateway_label ); ?>" class="regular-text">
+                            <input type="text" name="gateway_label" id="gateway_label" value="<?php echo esc_attr( $gateway_label ); ?>" class="regular-text">
                             <p class="description"><?php _e( 'This is the name shown to customers at checkout.', 'wptravelengine-maya-payment' ); ?></p>
                         </td>
                     </tr>
@@ -171,7 +180,7 @@ class AdminSettings {
                             <label for="description"><?php _e( 'Description', 'wptravelengine-maya-payment' ); ?></label>
                         </th>
                         <td>
-                            <textarea name="wte_maya_settings[description]" id="description" rows="3" class="large-text"><?php echo esc_textarea( $description ); ?></textarea>
+                            <textarea name="description" id="description" rows="3" class="large-text"><?php echo esc_textarea( $description ); ?></textarea>
                             <p class="description"><?php _e( 'Additional description shown to customers during checkout.', 'wptravelengine-maya-payment' ); ?></p>
                         </td>
                     </tr>
@@ -182,7 +191,7 @@ class AdminSettings {
                             <label for="instruction"><?php _e( 'Instructions', 'wptravelengine-maya-payment' ); ?></label>
                         </th>
                         <td>
-                            <textarea name="wte_maya_settings[instruction]" id="instruction" rows="3" class="large-text"><?php echo esc_textarea( $instruction ); ?></textarea>
+                            <textarea name="instruction" id="instruction" rows="3" class="large-text"><?php echo esc_textarea( $instruction ); ?></textarea>
                             <p class="description"><?php _e( 'Instructions displayed at checkout before payment.', 'wptravelengine-maya-payment' ); ?></p>
                         </td>
                     </tr>
@@ -194,7 +203,7 @@ class AdminSettings {
                         </th>
                         <td>
                             <label>
-                                <input type="checkbox" name="wte_maya_settings[test_mode]" id="test_mode" value="1" <?php checked( $test_mode, true ); ?>>
+                                <input type="checkbox" name="test_mode" id="test_mode" value="1" <?php checked( $test_mode, true ); ?>>
                                 <?php _e( 'Enable test mode (use Sandbox environment)', 'wptravelengine-maya-payment' ); ?>
                             </label>
                             <p class="description">
@@ -216,7 +225,7 @@ class AdminSettings {
                             <label for="public_key"><?php _e( 'Public API Key', 'wptravelengine-maya-payment' ); ?></label>
                         </th>
                         <td>
-                            <input type="text" name="wte_maya_settings[public_key]" id="public_key" value="<?php echo esc_attr( $public_key ); ?>" class="large-text" placeholder="pk-...">
+                            <input type="text" name="public_key" id="public_key" value="<?php echo esc_attr( $public_key ); ?>" class="large-text" placeholder="pk-...">
                             <p class="description">
                                 <?php _e( 'Enter your Maya Public API Key (starts with pk-).', 'wptravelengine-maya-payment' ); ?>
                                 <?php _e( 'Get your keys from', 'wptravelengine-maya-payment' ); ?>
