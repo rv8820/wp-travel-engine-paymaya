@@ -271,6 +271,23 @@ class Payment extends BaseGateway {
     public function handle_success_request( Booking $booking, PaymentModel $payment ): void {
         $payment_key = sanitize_text_field( $_REQUEST['payment_key'] ?? '' );
 
+        // Update payment status
+        $payment->set_status( 'publish' );
+        $payment->set_meta( 'payment_status', 'completed' );
+        $payment->save();
+
+        // Update booking status
+        $booking_id = $booking->get_id();
+        wp_update_post( array(
+            'ID' => $booking_id,
+            'post_status' => 'publish',
+        ) );
+        update_post_meta( $booking_id, 'wp_travel_engine_booking_status', 'booked' );
+        update_post_meta( $booking_id, 'wp_travel_engine_booking_payment_status', 'paid' );
+
+        // Trigger booking completion hooks
+        do_action( 'wptravelengine_after_booking_process_completed', $booking_id );
+
         // Get confirmation page from settings
         $thankyou_page_id = wptravelengine_settings()->get( 'pages.wp_travel_engine_thank_you' );
         if ( $thankyou_page_id ) {

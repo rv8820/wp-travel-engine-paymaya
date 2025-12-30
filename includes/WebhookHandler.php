@@ -95,6 +95,18 @@ class WebhookHandler {
                 $payment->set_status( 'publish' );
                 $payment->set_meta( 'payment_status', 'completed' );
                 error_log( '[Maya Webhook] Payment marked as completed: ' . $payment->get_id() );
+
+                // Update booking status
+                $booking_id = $payment->get_meta( 'booking_id' );
+                if ( $booking_id ) {
+                    wp_update_post( array(
+                        'ID' => $booking_id,
+                        'post_status' => 'publish',
+                    ) );
+                    update_post_meta( $booking_id, 'wp_travel_engine_booking_status', 'booked' );
+                    update_post_meta( $booking_id, 'wp_travel_engine_booking_payment_status', 'paid' );
+                    error_log( '[Maya Webhook] Booking status updated to booked: ' . $booking_id );
+                }
             } elseif ( $is_pending ) {
                 $payment->set_status( 'pending' );
                 $payment->set_meta( 'payment_status', 'pending' );
