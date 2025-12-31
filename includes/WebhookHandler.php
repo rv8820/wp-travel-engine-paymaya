@@ -112,7 +112,10 @@ class WebhookHandler {
                 if ( $booking_id && is_numeric( $booking_id ) && $booking_id > 0 ) {
                     // Verify booking exists
                     $booking_post = get_post( $booking_id );
-                    if ( $booking_post && $booking_post->post_type === 'booking' ) {
+                    if ( $booking_post ) {
+                        error_log( '[Maya Webhook] Found booking - ID: ' . $booking_id . ', Type: ' . $booking_post->post_type );
+
+                        // Update booking (WP Travel Engine uses 'booking' post type)
                         wp_update_post( array(
                             'ID' => $booking_id,
                             'post_status' => 'publish',
@@ -121,7 +124,7 @@ class WebhookHandler {
                         update_post_meta( $booking_id, 'wp_travel_engine_booking_payment_status', 'paid' );
                         error_log( '[Maya Webhook] Booking status updated to booked: ' . $booking_id );
                     } else {
-                        error_log( '[Maya Webhook] Invalid booking ID: ' . $booking_id );
+                        error_log( '[Maya Webhook] Booking not found: ' . $booking_id );
                     }
                 }
             } elseif ( $is_pending ) {
