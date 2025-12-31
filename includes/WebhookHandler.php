@@ -98,14 +98,20 @@ class WebhookHandler {
 
                 // Update booking status
                 $booking_id = $payment->get_meta( 'booking_id' );
-                if ( $booking_id ) {
-                    wp_update_post( array(
-                        'ID' => $booking_id,
-                        'post_status' => 'publish',
-                    ) );
-                    update_post_meta( $booking_id, 'wp_travel_engine_booking_status', 'booked' );
-                    update_post_meta( $booking_id, 'wp_travel_engine_booking_payment_status', 'paid' );
-                    error_log( '[Maya Webhook] Booking status updated to booked: ' . $booking_id );
+                if ( $booking_id && is_numeric( $booking_id ) && $booking_id > 0 ) {
+                    // Verify booking exists
+                    $booking_post = get_post( $booking_id );
+                    if ( $booking_post && $booking_post->post_type === 'booking' ) {
+                        wp_update_post( array(
+                            'ID' => $booking_id,
+                            'post_status' => 'publish',
+                        ) );
+                        update_post_meta( $booking_id, 'wp_travel_engine_booking_status', 'booked' );
+                        update_post_meta( $booking_id, 'wp_travel_engine_booking_payment_status', 'paid' );
+                        error_log( '[Maya Webhook] Booking status updated to booked: ' . $booking_id );
+                    } else {
+                        error_log( '[Maya Webhook] Invalid booking ID: ' . $booking_id );
+                    }
                 }
             } elseif ( $is_pending ) {
                 $payment->set_status( 'pending' );
@@ -180,11 +186,20 @@ class WebhookHandler {
         global $wpdb;
 
         // Reference number format: {booking_id}-{payment_id}-{timestamp}
+        // Skip if it looks like a UUID (has non-numeric parts)
+        if ( ! preg_match( '/^\d+-\d+-\d+$/', $ref_number ) ) {
+            return null;
+        }
+
         $parts = explode( '-', $ref_number );
         if ( count( $parts ) >= 2 ) {
             $payment_id = intval( $parts[1] );
             if ( $payment_id > 0 ) {
-                return new \WPTravelEngine\Core\Models\Post\Payment( $payment_id );
+                $payment = new \WPTravelEngine\Core\Models\Post\Payment( $payment_id );
+                // Validate payment exists
+                if ( $payment && $payment->get_id() > 0 ) {
+                    return $payment;
+                }
             }
         }
 
