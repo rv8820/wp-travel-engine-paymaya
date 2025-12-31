@@ -76,6 +76,17 @@ class WebhookHandler {
                 ), 200 );
             }
 
+            // Validate payment has valid booking
+            $booking_id = $payment->get_meta( 'booking_id' );
+            if ( ! $booking_id || ! is_numeric( $booking_id ) || $booking_id <= 0 ) {
+                error_log( '[Maya Webhook] Payment found but has invalid booking_id: ' . $booking_id );
+                return new \WP_REST_Response( array(
+                    'success' => true,
+                    'message' => 'Webhook received but payment has invalid booking reference',
+                    'payment_id' => $payment->get_id(),
+                ), 200 );
+            }
+
             // Check if already processed
             $processed_key = 'maya_webhook_processed_' . $transaction_id;
             if ( get_transient( $processed_key ) ) {
@@ -173,7 +184,11 @@ class WebhookHandler {
         ) );
 
         if ( $payment_id ) {
-            return new \WPTravelEngine\Core\Models\Post\Payment( $payment_id );
+            $payment = new \WPTravelEngine\Core\Models\Post\Payment( $payment_id );
+            // Validate payment exists and is valid
+            if ( $payment && $payment->get_id() > 0 ) {
+                return $payment;
+            }
         }
 
         return null;
